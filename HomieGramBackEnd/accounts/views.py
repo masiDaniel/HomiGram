@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from .serializers import AccountSerializer, MessageSerializer
 from knox.models import AuthToken
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import permission_classes
 from rest_framework import status
 from rest_framework.response import Response
@@ -78,4 +78,22 @@ class RegisterUsersAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class UserSearchAPIView(APIView):
+    """
+    Handles searching for a user or retrieving all users
+    """
+    # permission_classes = [IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        """
+        Handles getting all users or searching for a specific user
+        """
+        query = request.query_params.get('q')
+
+        if query:
+            users = CustomUser.objects.filter(email__icontains=query)
+        else:
+            users = CustomUser.objects.all()
+
+        serializer = AccountSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

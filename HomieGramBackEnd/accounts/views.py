@@ -16,14 +16,6 @@ class LoginApIView(APIView):
     """
     permission_classes = [AllowAny]
 
-    # TODO restrict these get request to users who are authenticated
-    def get(self, request, *args, **kwargs):
-        """
-        Handles loging out of the user
-        """
-        logout(request)
-        return Response({"message": "logged out succesfully."}, status=status.HTTP_200_OK)
-
     def post(self, request, *args, **kwargs):
         """
         Handles log in of the user
@@ -48,6 +40,21 @@ class LoginApIView(APIView):
                 }
             serializer = MessageSerializer(data)
             return Response(serializer.data, status=status.HTTP_403_FORBIDDEN)
+
+class LogoutAPIView(APIView):
+    """
+    Handles User logout
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles log out of the user
+        """
+        logout(request)
+        return Response({"message": "Logged out successfully."}, status=status.HTTP_200_OK)
+
+
 
 class RegisterUsersAPIView(APIView):
     """
